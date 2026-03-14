@@ -6,17 +6,23 @@ $previewWidth = 600  # 横幅（お好みで調整）
 # 1. 全モニターの範囲（仮想スクリーン）を取得
 # 1. 全モニターを結合した仮想スクリーンの領域を取得
 $vScreen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+$cursorPos = [System.Windows.Forms.Cursor]::Position
 
 # 2. プレビューの高さ計算（アスペクト比維持）
 $scale = $previewWidth / $vScreen.Width
 $previewHeight = [int]($vScreen.Height * $scale)
 
 # 3. フォーム（ウィンドウ）の作成
+# プレビュー上のカーソル位置が、実際のカーソル位置の真下に来るようにウィンドウの表示位置を計算
+$formLeft = [int]($cursorPos.X - (($cursorPos.X - $vScreen.Left) * $scale))
+$formTop = [int]($cursorPos.Y - (($cursorPos.Y - $vScreen.Top) * $scale))
+
 $form = New-Object Windows.Forms.Form
 $form.Text = "Mouse Jump (PS版)"
 $form.Size = New-Object Drawing.Size($previewWidth, $previewHeight)
 $form.FormBorderStyle = "FixedToolWindow"
-$form.StartPosition = "CenterScreen"
+$form.StartPosition = "Manual"
+$form.Location = New-Object Drawing.Point($formLeft, $formTop)
 $form.TopMost = $true
 
 # 4. スクリーンショットの取得
